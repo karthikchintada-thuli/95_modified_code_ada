@@ -3,13 +3,17 @@ import torch
 import os
 from face_alignment import align
 import numpy as np
+from torch.serialization import add_safe_globals, safe_globals
+from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 
+# Global allow-list (affects the whole process):
+add_safe_globals([ModelCheckpoint])
 
 adaface_models = {
     'ir_50':"pretrained/adaface_ir50_ms1mv2.ckpt",
 }
 
-def load_pretrained_model(architecture='ir_50'):
+def load_pretrained_model(architecture='ir_100'):
     # load model and pretrained statedict
     assert architecture in adaface_models.keys()
     model = net.build_model(architecture)
@@ -41,5 +45,3 @@ if __name__ == '__main__':
 
     similarity_scores = torch.cat(features) @ torch.cat(features).T
     print(similarity_scores)
-    
-
