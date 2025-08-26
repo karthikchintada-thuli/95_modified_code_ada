@@ -5,7 +5,7 @@ from face_alignment import align
 import numpy as np
 from torch.serialization import add_safe_globals, safe_globals
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Global allow-list (affects the whole process):
 add_safe_globals([ModelCheckpoint])
 
@@ -17,7 +17,7 @@ def load_pretrained_model(architecture='ir_100'):
     # load model and pretrained statedict
     assert architecture in adaface_models.keys()
     model = net.build_model(architecture)
-    statedict = torch.load(adaface_models[architecture])['state_dict']
+    statedict = torch.load(adaface_models[architecture], weights_only=False, map_location = device)['state_dict']
     model_statedict = {key[6:]:val for key, val in statedict.items() if key.startswith('model.')}
     model.load_state_dict(model_statedict)
     model.eval()
